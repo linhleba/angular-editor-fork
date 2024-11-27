@@ -51,7 +51,8 @@ export class AppComponent implements OnInit {
     toolbarHiddenButtons: [
       ['bold', 'italic'],
       ['fontSize']
-    ]
+    ],
+    maxPasteImageSize: 1048576
   };
 
   config2: AngularEditorConfig = {
@@ -80,7 +81,8 @@ export class AppComponent implements OnInit {
         class: 'titleText',
         tag: 'h1',
       },
-    ]
+    ],
+    maxPasteImageSize: 1048576
   };
 
   constructor(private formBuilder: FormBuilder, private ngZone: NgZone) {}
@@ -91,10 +93,10 @@ export class AppComponent implements OnInit {
     });
     console.log(this.htmlContent1);
 
-    this.ngZone.onStable.subscribe(() => {
-      this.detectionCount++;
-      console.log(`Change detection cycle completed. Count: ${this.detectionCount}`);
-    });
+    // this.ngZone.onStable.subscribe(() => {
+    //   this.detectionCount++;
+    //   console.log(`Change detection cycle completed. Count: ${this.detectionCount}`);
+    // });
   }
 
   onChange(event) {
@@ -107,5 +109,10 @@ export class AppComponent implements OnInit {
 
   onChange2(event) {
     console.warn(this.form.value);
+  }
+
+  handleValidationError(message: string): void {
+    // this.validationErrorMessage = message;
+    console.error('Editor Validation Error:', message);
   }
 }

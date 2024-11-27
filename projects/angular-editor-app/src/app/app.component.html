@@ -6,7 +6,7 @@
   <input id="test_input">
   <br><br>
   <angular-editor id="editor1" [(ngModel)]="htmlContent1" [config]="config1" (ngModelChange)="onChange($event)"
-                  (blur)="onBlur($event)">
+                  (blur)="onBlur($event)" (validationError)="handleValidationError($event)">
     <ng-template #customButtons let-executeCommandFn="executeCommandFn">
       <ae-toolbar-set>
         <ae-button iconClass="fa fa-html5" title="Angular editor logo" (buttonClick)="executeCommandFn('insertHtml', angularEditorLogo)"></ae-button>
@@ -17,7 +17,7 @@
     HTML Output:  {{ htmlContent1 }}
   </p>
   <form [formGroup]="form">
-    <angular-editor autofocus="true" id="editor2" formControlName="signature" [config]="config2" (ngModelChange)="onChange2($event)"></angular-editor>
+    <angular-editor autofocus="true" id="editor2" formControlName="signature" [config]="config2" (ngModelChange)="onChange2($event)" (validationError)="handleValidationError($event)"></angular-editor>
   </form>
   <p>
     Form Value: {{ form.value.signature }}

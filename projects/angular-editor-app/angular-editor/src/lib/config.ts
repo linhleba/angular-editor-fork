@@ -38,6 +38,8 @@ export interface AngularEditorConfig {
   outline?: boolean;
   toolbarHiddenButtons?: string[][];
   rawPaste?: boolean;
+  maxPasteImageSize?: number;
+  validationMessage?: string;
 }
 
 export const angularEditorConfig: AngularEditorConfig = {

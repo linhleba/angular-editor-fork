@@ -55,6 +55,8 @@ export class AngularEditorComponent implements OnInit, ControlValueAccessor, Aft
 
   @Input() id = '';
   @Input() config: AngularEditorConfig = angularEditorConfig;
+  @Output() validationError = new EventEmitter<string>();
+  warningMessage: string | null = null;
   @Input() placeholder = '';
   @Input() tabIndex: number | null;
 
@@ -107,6 +109,31 @@ export class AngularEditorComponent implements OnInit, ControlValueAccessor, Aft
   }
 
   onPaste(event: ClipboardEvent){
+    // this.pasteError = null;
+
+    if (!event.clipboardData) {
+      return;
+    }
+
+    // Get the clipboard items
+
+    if (this.config.maxPasteImageSize) {
+      const items = Array.from(event.clipboardData.items);
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+
+          if (file && file.size > this.config.maxPasteImageSize) {
+            event.preventDefault();
+            this.warningMessage = 
+              `Image is too large! Maximum allowed size is ${this.config.maxPasteImageSize / 1024 / 1024} MB.`;
+            this.validationError.emit(this.warningMessage); 
+            return;
+          }
+        }
+      }
+    }
+
     if (this.config.rawPaste) {
       event.preventDefault();
       const text = event.clipboardData.getData('text/plain');
