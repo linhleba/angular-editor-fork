@@ -108,6 +108,52 @@ export class AngularEditorComponent implements OnInit, ControlValueAccessor, Aft
     }
   }
 
+  uploadImage(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      const imageUrl = e.target?.result as string;
+  
+      // Insert the image URL into the editor content
+      document.execCommand('insertImage', false, imageUrl);
+    };
+
+    console.log('file is', file);
+    console.log(`FILE image size is ${file.size / 1024 / 1024} MB, ${file.size / 1024} KB`)
+    reader.readAsDataURL(file);
+  }
+
+  compressImage(file: File, quality: number, callback: (blob: Blob) => void): void {
+    const img = new Image();
+    const reader = new FileReader();
+  
+    reader.onload = (e) => {
+      img.src = e.target?.result as string;
+  
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        
+        let { width, height } = img;
+  
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+  
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              callback(blob);
+            }
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+    };
+  
+    reader.readAsDataURL(file);
+  }
+
   onPaste(event: ClipboardEvent){
     // this.pasteError = null;
 
@@ -125,11 +171,21 @@ export class AngularEditorComponent implements OnInit, ControlValueAccessor, Aft
 
           if (file && file.size > this.config.maxPasteImageSize) {
             event.preventDefault();
+            console.log(`before compress ${file.size / 1024 / 1024} MB, ${file.size / 1024} KB`)
             this.warningMessage = 
               `Image is too large! Maximum allowed size is ${this.config.maxPasteImageSize / 1024 / 1024} MB.`;
             this.validationError.emit(this.warningMessage); 
+            this.compressImage(file, 0.7, (compressedBlob) => {
+              const compressedFile = new File([compressedBlob], file.name, {
+                type: compressedBlob.type,
+              });
+              console.log('Compressed File Size:', compressedFile.size / 1024, 'KB');
+              this.uploadImage(compressedFile);
+            });
+            console.log('image uplodated');
             return;
           }
+          console.log(`image size is ${file.size / 1024 / 1024} MB, ${file.size / 1024} KB`)
         }
       }
     }
