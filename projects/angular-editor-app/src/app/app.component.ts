@@ -52,7 +52,8 @@ export class AppComponent implements OnInit {
       ['bold', 'italic'],
       ['fontSize']
     ],
-    maxPasteImageSize: 419000
+    maxPasteImageSize: 419000,
+    previewMode: true
   };
 
   config2: AngularEditorConfig = {
@@ -82,7 +83,8 @@ export class AppComponent implements OnInit {
         tag: 'h1',
       },
     ],
-    maxPasteImageSize: 419000
+    maxPasteImageSize: 419000,
+    previewMode: true
   };
 
   constructor(private formBuilder: FormBuilder, private ngZone: NgZone) {}

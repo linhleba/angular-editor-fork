@@ -170,7 +170,7 @@
       [hidden]="isButtonHidden('toggleEditorMode')"
       tabindex="-1"
     >
-      <i class="fa">{{ previewMode ? 'Edit' : 'Preview' }}</i>
+      <i class="fa">{{ !isPreviewMode ? 'Edit' : 'Preview' }}</i>
     </button>
   </div>
   <ng-content></ng-content>

@@ -23,6 +23,10 @@ import { Observable } from 'rxjs';
 })
 
 export class AngularEditorToolbarComponent {
+
+  ngOnInit() {
+    console.log('previewMode is', this.previewMode);
+  }
   htmlMode = false;
   linkSelected = false;
   block = 'default';
@@ -31,6 +35,7 @@ export class AngularEditorToolbarComponent {
   foreColour;
   backColor;
   @Input() previewMode?: boolean;
+  @Input() isPreviewMode?: boolean;
 
 
   headings: SelectOption[] = [

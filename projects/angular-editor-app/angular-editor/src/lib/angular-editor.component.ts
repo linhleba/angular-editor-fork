@@ -108,6 +108,7 @@ export class AngularEditorComponent implements OnInit, ControlValueAccessor, Aft
   }
 
   ngOnInit() {
+    console.log('config', this.config.previewMode);
     this.config.toolbarPosition = this.config.toolbarPosition ? this.config.toolbarPosition : angularEditorConfig.toolbarPosition;
   }
 
@@ -233,26 +234,23 @@ export class AngularEditorComponent implements OnInit, ControlValueAccessor, Aft
     if (command === 'preview') {
       this.isPreviewMode = !this.isPreviewMode;
       let editorEl = this.editor.nativeElement;
-      if (this.isPreviewMode) {
+      if (!this.isPreviewMode) {
           // Lưu lại nội dung gốc
-          // this.originalRawContent = editorEl.innerHTML;
-        // const rawHtml = editorEl.innerHTML;
-        const rawHtml = '!(image.jpg)(attachment:image.jpg)';
-
+          this.originalRawContent = editorEl.innerHTML;
+        const rawHtml = editorEl.innerHTML;
         // URL giả cho ảnh S3, có thể thay đổi thành URL thực tế của bạn
-        const s3BaseUrl = 'https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg'; 
+        const s3BaseUrl = 'https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f'; 
 
         // Thay thế 'attachment:' bằng URL thật
         const updatedHtml = rawHtml.replace(
           /!\([^)]+\)\(attachment:([^)]+)\)/g,
           (match, filename) => {
-            // const realUrl = `${s3BaseUrl}/300x200?text=${filename}`; // URL thực tế của ảnh
-            return `1234 <img src="${s3BaseUrl}" alt="${filename}" />`; 
+            const realUrl = `<img src="${s3BaseUrl}/${filename}" />`;
+            return realUrl;
           }
         );
 
         console.log('updateHtml', updatedHtml);
-        // Lưu HTML đã thay thế và hiển thị trong chế độ preview
         editorEl.innerHTML = updatedHtml;
         editorEl.setAttribute('contenteditable', 'false');
       }
@@ -262,8 +260,8 @@ export class AngularEditorComponent implements OnInit, ControlValueAccessor, Aft
           /<img[^>]+src="[^"]+\/([^"/]+)"[^>]*>/g,
           (match, filename) => `!(${filename})(attachment:${filename})`
         );
-    
-        editorEl.innerText = reverted;
+        
+        editorEl.innerHTML = reverted;
         editorEl.setAttribute('contenteditable', 'true');
       }
     }

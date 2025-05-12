@@ -40,6 +40,7 @@ export interface AngularEditorConfig {
   rawPaste?: boolean;
   maxPasteImageSize?: number;
   validationMessage?: string;
+  previewMode?: boolean;
 }
 
 export const angularEditorConfig: AngularEditorConfig = {
@@ -68,6 +69,7 @@ export const angularEditorConfig: AngularEditorConfig = {
   sanitize: true,
   toolbarPosition: 'top',
   outline: true,
+  previewMode: true,
   /*toolbarHiddenButtons: [
     ['bold', 'italic', 'underline', 'strikeThrough', 'superscript', 'subscript'],
     ['heading', 'fontName', 'fontSize', 'color'],

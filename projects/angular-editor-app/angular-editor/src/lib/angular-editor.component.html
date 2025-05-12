@@ -16,7 +16,8 @@
           [defaultFontName]="config.defaultFontName"
           [defaultFontSize]="config.defaultFontSize"
           [hiddenButtons]="config.toolbarHiddenButtons"
-          [previewMode]="isPreviewMode"
+          [previewMode]="config.previewMode"
+          [isPreviewMode]="isPreviewMode"
           (execute)="executeCommand($event)"
      >
        <ng-container
