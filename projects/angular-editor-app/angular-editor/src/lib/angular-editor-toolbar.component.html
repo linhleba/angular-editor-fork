@@ -159,5 +159,19 @@
             (click)="triggerCommand('toggleEditorMode')" [hidden]="isButtonHidden('toggleEditorMode')" tabindex="-1"><i
       class='fa fa-code'></i></button>
   </div>
+  <div class="angular-editor-toolbar-set">
+    <button
+      *ngIf="previewMode !== undefined"
+      [id]="'preview-' + id"
+      type="button"
+      title="Preview button"
+      class="angular-editor-button"
+      (click)="triggerCommand('preview')"
+      [hidden]="isButtonHidden('toggleEditorMode')"
+      tabindex="-1"
+    >
+      <i class="fa">{{ previewMode ? 'Edit' : 'Preview' }}</i>
+    </button>
+  </div>
   <ng-content></ng-content>
 </div>

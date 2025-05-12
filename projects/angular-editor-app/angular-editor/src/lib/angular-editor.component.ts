@@ -19,11 +19,16 @@ import {
   ViewChild
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AngularEditorToolbarComponent } from './angular-editor-toolbar.component';
 import { AngularEditorService } from './angular-editor.service';
 import { AngularEditorConfig, angularEditorConfig } from './config';
 import { isDefined } from './utils';
+
+
+
 
 @Component({
   selector: 'angular-editor',
@@ -39,7 +44,10 @@ import { isDefined } from './utils';
   ]
 })
 export class AngularEditorComponent implements OnInit, ControlValueAccessor, AfterViewInit, OnDestroy {
-
+  @ViewChild('editor', { static: false }) editor!: ElementRef;
+  editorContent: string = '';  
+  isPreviewMode = false;
+  originalRawContent = ''; 
   private onChange: (value: string) => void;
   private onTouched: () => void;
 
@@ -92,6 +100,7 @@ export class AngularEditorComponent implements OnInit, ControlValueAccessor, Aft
     private sanitizer: DomSanitizer,
     private cdRef: ChangeDetectorRef,
     @Attribute('tabindex') defaultTabIndex: string,
+    private http: HttpClient,
     @Attribute('autofocus') private autoFocus: any
   ) {
     const parsedTabIndex = Number(defaultTabIndex);
@@ -108,18 +117,33 @@ export class AngularEditorComponent implements OnInit, ControlValueAccessor, Aft
     }
   }
 
-  uploadImage(file: File): void {
-    const reader = new FileReader();
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      const imageUrl = e.target?.result as string;
-  
-      // Insert the image URL into the editor content
-      document.execCommand('insertImage', false, imageUrl);
-    };
+  insertMarkdown(markdown: string) {
+    // const textarea = this.editorTextarea.nativeElement;
+    // const cursorPos = textarea.selectionStart;
+    // const text = textarea.value;
+    // textarea.value = text.slice(0, cursorPos) + markdown + text.slice(cursorPos);
+  }
 
-    console.log('file is', file);
-    console.log(`FILE image size is ${file.size / 1024 / 1024} MB, ${file.size / 1024} KB`)
-    reader.readAsDataURL(file);
+  uploadImage(file: File): void {
+    // const reader = new FileReader();
+    // reader.onload = (e: ProgressEvent<FileReader>) => {
+    //   const imageUrl = e.target?.result as string;
+  
+    //   // Insert the image URL into the editor content
+    //   document.execCommand('insertImage', false, imageUrl);
+    // };
+
+    // console.log('file is', file);
+    // console.log(`FILE image size is ${file.size / 1024 / 1024} MB, ${file.size / 1024} KB`)
+    // reader.readAsDataURL(file);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    this.http.post<{ filename: string }>('your-api/upload', formData)
+    .subscribe((res) => {
+      const markdown = `![${res.filename}](attachment:${res.filename})`;
+      // this.insertMarkdown(markdown);
+    });
   }
 
   compressImage(file: File, quality: number, callback: (blob: Blob) => void): void {
@@ -205,6 +229,44 @@ export class AngularEditorComponent implements OnInit, ControlValueAccessor, Aft
    */
   executeCommand(command: string, value?: string) {
     this.focus();
+    console.log('command is', command);
+    if (command === 'preview') {
+      this.isPreviewMode = !this.isPreviewMode;
+      let editorEl = this.editor.nativeElement;
+      if (this.isPreviewMode) {
+          // Lưu lại nội dung gốc
+          // this.originalRawContent = editorEl.innerHTML;
+        // const rawHtml = editorEl.innerHTML;
+        const rawHtml = '!(image.jpg)(attachment:image.jpg)';
+
+        // URL giả cho ảnh S3, có thể thay đổi thành URL thực tế của bạn
+        const s3BaseUrl = 'https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg'; 
+
+        // Thay thế 'attachment:' bằng URL thật
+        const updatedHtml = rawHtml.replace(
+          /!\([^)]+\)\(attachment:([^)]+)\)/g,
+          (match, filename) => {
+            // const realUrl = `${s3BaseUrl}/300x200?text=${filename}`; // URL thực tế của ảnh
+            return `1234 <img src="${s3BaseUrl}" alt="${filename}" />`; 
+          }
+        );
+
+        console.log('updateHtml', updatedHtml);
+        // Lưu HTML đã thay thế và hiển thị trong chế độ preview
+        editorEl.innerHTML = updatedHtml;
+        editorEl.setAttribute('contenteditable', 'false');
+      }
+      else {
+        const currentHtml = editorEl.innerHTML;
+        const reverted = currentHtml.replace(
+          /<img[^>]+src="[^"]+\/([^"/]+)"[^>]*>/g,
+          (match, filename) => `!(${filename})(attachment:${filename})`
+        );
+    
+        editorEl.innerText = reverted;
+        editorEl.setAttribute('contenteditable', 'true');
+      }
+    }
     if (command === 'focus') {
       return;
     }

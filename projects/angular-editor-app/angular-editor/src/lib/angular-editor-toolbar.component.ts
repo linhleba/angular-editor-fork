@@ -30,6 +30,8 @@ export class AngularEditorToolbarComponent {
   fontSize = '3';
   foreColour;
   backColor;
+  @Input() previewMode?: boolean;
+
 
   headings: SelectOption[] = [
     {
@@ -342,11 +344,24 @@ export class AngularEditorToolbarComponent {
       }
   }
 
+  // togglePreview() {
+  //   const s3BaseUrl = 'https://via.placeholder.com'; // dùng ảnh giả
+  //   this.previewHTML = this.htmlContent.replace(
+  //     /<img[^>]*src=["']attachment:([^"']+)["'][^>]*>/g,
+  //     (match, filename) => {
+  //       // Ví dụ: test-image.png → https://via.placeholder.com/300x200?text=test-image.png
+  //       const fakeImageUrl = `${s3BaseUrl}/300x200?text=${filename}`;
+  //       return match.replace(`attachment:${filename}`, fakeImageUrl);
+  //     }
+  //   );
+  // }
+
+
   watchUploadImage(response: HttpResponse<{imageUrl: string}>, event) {
     const { imageUrl } = response.body;
     this.editorService.insertImage(imageUrl);
     event.srcElement.value = null;
-  }
+  }1478
 
   /**
    * Set custom class
